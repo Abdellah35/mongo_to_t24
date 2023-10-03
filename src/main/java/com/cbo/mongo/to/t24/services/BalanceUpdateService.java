@@ -5,9 +5,7 @@ import com.cbo.mongo.to.t24.persistence.models.AccountInfo;
 import com.cbo.mongo.to.t24.services.impl.SoapClient;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +22,7 @@ public class BalanceUpdateService {
 
 
 
-    public String updateBalance() throws JAXBException, IOException {
+    public String updateBalance() throws IOException {
         List<AccountInfo> updatedAccountInfo = new ArrayList<>();
         try {
 
@@ -36,6 +34,7 @@ public class BalanceUpdateService {
 
                 if (updatedAcc != null){
                     accoount.setAmount(updatedAcc.getAmount());
+                    System.out.println("updated balance: "+ updatedAcc.getAmount());
                 }
                 updatedAccountInfo.add(accoount);
             }
