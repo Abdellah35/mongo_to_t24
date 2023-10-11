@@ -5,6 +5,7 @@ import com.cbo.mongo.to.t24.persistence.repository.AccountInfoRepository;
 import com.cbo.mongo.to.t24.services.AccountInfoService;
 import com.cbo.mongo.to.t24.utils.AccountNumbersList;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class AccountInfoServiceImpl implements AccountInfoService {
         }else{
             List<AccountInfo> accountInfoByAcc = accountInfoRepository.findByAccountNumber(accountInfo.getAccountNumber());
             if(accountInfoByAcc.isEmpty()){
+
                 return accountInfoRepository.save(accountInfo);
             }
         }return null;

@@ -4,6 +4,7 @@ import com.cbo.mongo.to.t24.persistence.models.AccountInfo;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -69,6 +70,8 @@ public class SoapClient {
                 } else {
                     accountInfo.setAmount(Double.valueOf(workingBalance));
                 }
+
+
                 accountInfo.setAccountNumber(accountNumber);
                 accountInfo.setFullName(shortTitle);
                 return accountInfo;
