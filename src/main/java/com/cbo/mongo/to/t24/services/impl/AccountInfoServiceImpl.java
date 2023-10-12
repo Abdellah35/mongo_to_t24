@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service("accountInfoService")
@@ -31,7 +32,8 @@ public class AccountInfoServiceImpl implements AccountInfoService {
         }else{
             List<AccountInfo> accountInfoByAcc = accountInfoRepository.findByAccountNumber(accountInfo.getAccountNumber());
             if(accountInfoByAcc.isEmpty()){
-
+                accountInfo.setLastModified(LocalDateTime.now());
+                System.out.println(accountInfo.getLastModified());
                 return accountInfoRepository.save(accountInfo);
             }
         }return null;
