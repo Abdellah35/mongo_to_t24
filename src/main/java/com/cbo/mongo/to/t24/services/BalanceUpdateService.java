@@ -1,7 +1,7 @@
 package com.cbo.mongo.to.t24.services;
 
 
-import com.cbo.mongo.to.t24.persistence.models.AccountInfo;
+import com.cbo.mongo.to.t24.persistence.models.ReportModel;
 import com.cbo.mongo.to.t24.services.impl.SoapClient;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,22 +23,30 @@ public class BalanceUpdateService {
 
 
     public String updateBalance() throws IOException {
-        List<AccountInfo> updatedAccountInfo = new ArrayList<>();
+        List<ReportModel> updatedReportModel = new ArrayList<>();
         try {
 
-            List<AccountInfo> listAccount = accountInfoService.accountInfosForSys();
+            List<ReportModel> listAccount = accountInfoService.accountInfosForSys();
+            System.out.println(listAccount);
+            for (ReportModel reportModel : listAccount) {
 
-            for (AccountInfo accoount : listAccount) {
-
-                AccountInfo updatedAcc = updateBalance(accoount.getAccountNumber());
+                ReportModel updatedAcc = updateBalance(1L);
 
                 if (updatedAcc != null){
-                    accoount.setAmount(updatedAcc.getAmount());
-                    System.out.println("updated balance: "+ updatedAcc.getAmount());
+                    reportModel.setNoTr(updatedAcc.getNoTr());
+                    reportModel.setNoDebit(updatedAcc.getNoDebit());
+                    reportModel.setNoCredit(updatedAcc.getNoCredit());
+                    reportModel.setTtlAmount(updatedAcc.getTtlAmount());
+                    reportModel.setTtlCrAmt(updatedAcc.getTtlCrAmt());
+                    reportModel.setTtlDrAmt(updatedAcc.getTtlDrAmt());
+
                 }
-                updatedAccountInfo.add(accoount);
+                updatedReportModel.add(reportModel);
             }
-            accountInfoService.updateAccountInfoBySys(updatedAccountInfo);
+            if (listAccount.isEmpty()){
+                accountInfoService.updateAccountInfoBySys(updatedReportModel);
+            }
+            accountInfoService.updateAccountInfoBySys(updatedReportModel);
 
         } catch (UnirestException e) {
             throw new RuntimeException(e);
@@ -47,7 +55,7 @@ public class BalanceUpdateService {
     }
 
 
-    public AccountInfo updateBalance(String accountNumber) throws UnirestException {
+    public ReportModel updateBalance(Long accountNumber) throws UnirestException {
 
         return soapClient.sendRequest(accountNumber);
 

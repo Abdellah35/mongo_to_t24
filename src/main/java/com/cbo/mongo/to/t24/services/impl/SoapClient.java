@@ -1,10 +1,9 @@
 package com.cbo.mongo.to.t24.services.impl;
 
-import com.cbo.mongo.to.t24.persistence.models.AccountInfo;
+import com.cbo.mongo.to.t24.persistence.models.ReportModel;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -22,21 +21,24 @@ import java.io.StringReader;
 @Service
 public class SoapClient {
 
-    @Value("${ecx.password}")
+    @Value("${report.password}")
     private String password;
 
-    @Value("${ecx.username}")
+    @Value("${report.username}")
     private String username;
 
-    public AccountInfo sendRequest(String accountNumber) throws UnirestException {
+    @Value("${report.uri}")
+    private String uri;
+
+    public ReportModel sendRequest(Long id) throws UnirestException {
 
 
-        AccountInfo accountInfo = new AccountInfo();
+        ReportModel reportModel = new ReportModel();
         try{
         Unirest.setTimeouts(0, 0);
-        HttpResponse<String> response = Unirest.post("http://10.1.245.45:8080/TWSECX/services")
+        HttpResponse<String> response = Unirest.post(uri)
                 .header("Content-Type", "text/xml")
-                .body(getBody(accountNumber))
+                .body(getBody())
                 .asString();
 
 
@@ -51,30 +53,29 @@ public class SoapClient {
             return null;
         }
 
-        NodeList acctNumberList = doc.getElementsByTagName("ns2:ACCTNUMBER");
-        NodeList shortTitleList = doc.getElementsByTagName("ns2:SHORTTITLE");
-        NodeList workingBalanceList = doc.getElementsByTagName("ns2:WORKINGBALANCE");
+        NodeList NODEBIT = doc.getElementsByTagName("ns2:NODEBIT");
+        NodeList TOTALDEBITAMT = doc.getElementsByTagName("ns2:TOTALDEBITAMT");
+        NodeList NOCREDIT = doc.getElementsByTagName("ns2:NOCREDIT");
+        NodeList TOTALCREDITAMT = doc.getElementsByTagName("ns2:TOTALCREDITAMT");
+        NodeList NOFTTR = doc.getElementsByTagName("ns2:NOFTTR");
+        NodeList TOTALFTAMT = doc.getElementsByTagName("ns2:TOTALFTAMT");
+        System.out.println("hr "+TOTALFTAMT.item(0).getTextContent());
 
+            for (int i = 0; i < NODEBIT.getLength(); i++) {
+                Element noOfCredit = (Element) NOCREDIT.item(i);
+                Element noOfDebit = (Element) NODEBIT.item(i);
+                Element totalCredit = (Element) TOTALCREDITAMT.item(i);
+                Element totalDebit = (Element) TOTALDEBITAMT.item(i);
+                Element noFTT = (Element) NOFTTR.item(i);
+                Element totalAlf = (Element) TOTALFTAMT.item(i);
 
-            for (int i = 0; i < acctNumberList.getLength(); i++) {
-                Element acctNumberElement = (Element) acctNumberList.item(i);
-                Element shortTitleElement = (Element) shortTitleList.item(i);
-                Element workingBalanceElement = (Element) workingBalanceList.item(i);
-                acctNumberElement.getTextContent();
-                String shortTitle = shortTitleElement.getTextContent();
-                String workingBalance = workingBalanceElement.getTextContent();
-
-                if (workingBalance == null || workingBalance.isEmpty()) {
-                    accountInfo.setAmount(0.00);
-
-                } else {
-                    accountInfo.setAmount(Double.valueOf(workingBalance));
-                }
-
-
-                accountInfo.setAccountNumber(accountNumber);
-                accountInfo.setFullName(shortTitle);
-                return accountInfo;
+                reportModel.setTtlDrAmt(totalDebit.getTextContent());
+                reportModel.setNoTr(noFTT.getTextContent());
+                reportModel.setTtlAmount(totalAlf.getTextContent());
+                reportModel.setNoDebit(noOfDebit.getTextContent());
+                reportModel.setNoCredit(noOfCredit.getTextContent());
+                reportModel.setTtlCrAmt(totalCredit.getTextContent());
+                return reportModel;
             }
             return null;
 
@@ -84,32 +85,25 @@ public class SoapClient {
     }
 
 
-    private String getBody(String accountNumber){
+    private String getBody(){
 
-        return "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tws=\"http://temenos.com/TWSECX\">" +
-                "\r\n   <soapenv:Header/>" +
-                "\r\n   <soapenv:Body>" +
-                "\r\n      <tws:WSECXACCT>" +
-                "\r\n         <WebRequestCommon>" +
-                "\r\n            <!--Optional:-->" +
-                "\r\n            <company></company>" +
-                "\r\n            <password>"+password+"</password>" +
-                "\r\n            <userName>"+username+"</userName>" +
-                "\r\n         </WebRequestCommon>" +
-                "\r\n         <ECXACCTLISTType>" +
-                "\r\n            <!--Zero or more repetitions:-->" +
-                "\r\n            <enquiryInputCollection>" +
-                "\r\n               <!--Optional:-->" +
-                "\r\n               <columnName>ACCOUNT.NUMBER</columnName>" +
-                "\r\n               <!--Optional:-->" +
-                "\r\n               <criteriaValue>"+accountNumber+"</criteriaValue>" +
-                "\r\n               <!--Optional:-->" +
-                "\r\n               <operand>EQ</operand>" +
-                "\r\n            </enquiryInputCollection>" +
-                "\r\n         </ECXACCTLISTType>" +
-                "\r\n      </tws:WSECXACCT>" +
-                "\r\n   </soapenv:Body>" +
-                "\r\n</soapenv:Envelope>";
+        return "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tws=\"http://temenos.com/TWSTRANS\">\n" +
+                "   <soapenv:Header/>\n" +
+                "   <soapenv:Body>\n" +
+                "      <tws:TOTALTRANSACTION>\n" +
+                "         <WebRequestCommon>\n" +
+                "            <!--Optional:-->\n" +
+                "            <company></company>\n" +
+                "            <password>"+password+"</password>\n" +
+                "            <userName>"+username+"</userName>\n" +
+                "         </WebRequestCommon>\n" +
+                "         <TRANSCOUNTType>\n" +
+                "            <!--Zero or more repetitions:-->\n" +
+                "           \n" +
+                "         </TRANSCOUNTType>\n" +
+                "      </tws:TOTALTRANSACTION>\n" +
+                "   </soapenv:Body>\n" +
+                "</soapenv:Envelope>";
     }
 
 }

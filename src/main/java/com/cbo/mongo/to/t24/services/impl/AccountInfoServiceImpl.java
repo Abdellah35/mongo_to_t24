@@ -1,11 +1,9 @@
 package com.cbo.mongo.to.t24.services.impl;
 
-import com.cbo.mongo.to.t24.persistence.models.AccountInfo;
+import com.cbo.mongo.to.t24.persistence.models.ReportModel;
 import com.cbo.mongo.to.t24.persistence.repository.AccountInfoRepository;
 import com.cbo.mongo.to.t24.services.AccountInfoService;
-import com.cbo.mongo.to.t24.utils.AccountNumbersList;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -24,67 +22,30 @@ public class AccountInfoServiceImpl implements AccountInfoService {
     @Autowired
     private SoapClient soapClient;
 
+
     @Override
-    public AccountInfo registerAccountInfo(AccountInfo accountInfo) {
+    public List<ReportModel> findAllAccountInfos() {
 
-        if(accountInfo.getFullName() == null){
-            return null;
-        }else{
-            List<AccountInfo> accountInfoByAcc = accountInfoRepository.findByAccountNumber(accountInfo.getAccountNumber());
-            if(accountInfoByAcc.isEmpty()){
-                accountInfo.setLastModified(LocalDateTime.now());
-                System.out.println(accountInfo.getLastModified());
-                return accountInfoRepository.save(accountInfo);
-            }
-        }return null;
-
-
+        return accountInfoRepository.findAll(Sort.by("fbusinessDate").ascending());
     }
 
     @Override
-    public List<AccountInfo> findAllAccountInfos() {
-
-        return accountInfoRepository.findAll(Sort.by("organizationName").ascending());
+    public void updateAccountInfoBySys(List<ReportModel> reportModels) {
+        accountInfoRepository.saveAll(reportModels);
     }
 
     @Override
-    public void updateAccountInfoBySys(List<AccountInfo> accountInfos) {
-        accountInfoRepository.saveAll(accountInfos);
-    }
-
-    @Override
-    public List<AccountInfo> accountInfosForSys() {
+    public List<ReportModel> accountInfosForSys() {
         return accountInfoRepository.findAll();
     }
 
     @Override
-    public AccountInfo findAccountInfoById(Long id) {
-
-        return accountInfoRepository.findById(id).orElse(null);
-    }
-
-    @Override
-    public AccountInfo getAccountInf(String accountNumber) throws UnirestException {
+    public ReportModel getAccountInf(Long id) throws UnirestException {
         try {
-            return soapClient.sendRequest(accountNumber);
+            return soapClient.sendRequest(id);
         }catch (UnirestException ex){
             throw new UnirestException("Unable to read t24 server");
         }
     }
 
-    @Override
-    public String addAccounts() {
-        List<String> accountNumbers= AccountNumbersList.accountNumbers;
-
-        accountNumbers.forEach(accountNumber -> {
-            try {
-                AccountInfo accountInfo = getAccountInf(accountNumber);
-                registerAccountInfo(accountInfo);
-            } catch (UnirestException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        return "successfully added";
-    }
 }

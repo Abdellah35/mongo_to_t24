@@ -16,14 +16,20 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Setter
-@Document("account_info")
-public class AccountInfo{
+@Document("report_model")
+public class ReportModel {
 
     @Id
     private ObjectId id;
-    private String accountNumber;
-    private String fullName;
-    private double amount;
+
+    private String fbusinessDate;
+    private String noCredit;
+    private String noDebit;
+    private String noTr;
+    private String ttlAmount;
+    private String ttlCrAmt;
+    private String ttlDrAmt;
+
     @LastModifiedDate
     private LocalDateTime lastModified;
 

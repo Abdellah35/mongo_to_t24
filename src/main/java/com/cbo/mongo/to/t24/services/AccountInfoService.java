@@ -1,23 +1,17 @@
 package com.cbo.mongo.to.t24.services;
 
-import com.cbo.mongo.to.t24.persistence.models.AccountInfo;
+import com.cbo.mongo.to.t24.persistence.models.ReportModel;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 import java.util.List;
 
 public interface AccountInfoService {
-    AccountInfo registerAccountInfo(AccountInfo committeeDTO);
+    List<ReportModel> findAllAccountInfos();
 
-    List<AccountInfo> findAllAccountInfos();
+    void updateAccountInfoBySys(List<ReportModel> reportModels);
 
-    void updateAccountInfoBySys(List<AccountInfo> accountInfos);
+    List<ReportModel> accountInfosForSys();
 
-    List<AccountInfo> accountInfosForSys();
-
-    AccountInfo findAccountInfoById(Long id);
-
-    AccountInfo getAccountInf(String accountNumber) throws UnirestException;
-
-    String addAccounts();
+    ReportModel getAccountInf(Long id) throws UnirestException;
 
 }
