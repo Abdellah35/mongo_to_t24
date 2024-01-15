@@ -40,9 +40,9 @@ public class AccountInfoServiceImpl implements AccountInfoService {
     }
 
     @Override
-    public ReportModel getAccountInf(Long id) throws UnirestException {
+    public ReportModel getAccountInf() throws UnirestException {
         try {
-            return soapClient.sendRequest(id);
+            return soapClient.sendRequest();
         }catch (UnirestException ex){
             throw new UnirestException("Unable to read t24 server");
         }

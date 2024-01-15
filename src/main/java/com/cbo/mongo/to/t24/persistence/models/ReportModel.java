@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Setter
-@Document("report_model")
+@Document("daily_report")
 public class ReportModel {
 
     @Id

@@ -7,6 +7,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,26 +27,17 @@ public class BalanceUpdateService {
         List<ReportModel> updatedReportModel = new ArrayList<>();
         try {
 
-            List<ReportModel> listAccount = accountInfoService.accountInfosForSys();
-            System.out.println(listAccount);
-            for (ReportModel reportModel : listAccount) {
+            ReportModel reportModel = new ReportModel();
 
-                ReportModel updatedAcc = updateBalance(1L);
-
-                if (updatedAcc != null){
-                    reportModel.setNoTr(updatedAcc.getNoTr());
-                    reportModel.setNoDebit(updatedAcc.getNoDebit());
-                    reportModel.setNoCredit(updatedAcc.getNoCredit());
-                    reportModel.setTtlAmount(updatedAcc.getTtlAmount());
-                    reportModel.setTtlCrAmt(updatedAcc.getTtlCrAmt());
-                    reportModel.setTtlDrAmt(updatedAcc.getTtlDrAmt());
-
-                }
-                updatedReportModel.add(reportModel);
-            }
-            if (listAccount.isEmpty()){
-                accountInfoService.updateAccountInfoBySys(updatedReportModel);
-            }
+            ReportModel updatedAcc = updateBalanceT24();
+            reportModel.setNoTr(updatedAcc.getNoTr());
+            reportModel.setNoDebit(updatedAcc.getNoDebit());
+            reportModel.setNoCredit(updatedAcc.getNoCredit());
+            reportModel.setTtlAmount(updatedAcc.getTtlAmount());
+            reportModel.setTtlCrAmt(updatedAcc.getTtlCrAmt());
+            reportModel.setTtlDrAmt(updatedAcc.getTtlDrAmt());
+            reportModel.setLastModified(LocalDateTime.now());
+            updatedReportModel.add(reportModel);
             accountInfoService.updateAccountInfoBySys(updatedReportModel);
 
         } catch (UnirestException e) {
@@ -55,9 +47,9 @@ public class BalanceUpdateService {
     }
 
 
-    public ReportModel updateBalance(Long accountNumber) throws UnirestException {
+    public ReportModel updateBalanceT24() throws UnirestException {
 
-        return soapClient.sendRequest(accountNumber);
+        return soapClient.sendRequest();
 
     }
 

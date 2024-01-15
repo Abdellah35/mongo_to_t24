@@ -12,6 +12,6 @@ public interface AccountInfoService {
 
     List<ReportModel> accountInfosForSys();
 
-    ReportModel getAccountInf(Long id) throws UnirestException;
+    ReportModel getAccountInf() throws UnirestException;
 
 }

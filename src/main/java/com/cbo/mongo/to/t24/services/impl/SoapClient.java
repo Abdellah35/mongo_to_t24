@@ -30,7 +30,7 @@ public class SoapClient {
     @Value("${report.uri}")
     private String uri;
 
-    public ReportModel sendRequest(Long id) throws UnirestException {
+    public ReportModel sendRequest() throws UnirestException {
 
 
         ReportModel reportModel = new ReportModel();
